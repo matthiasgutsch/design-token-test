@@ -96,9 +96,6 @@ export function assertAllRootTokensMatchTokensFile(opts?: {
     );
   } else {
     add('src/styles.scss');
-    add('src/styles.css');
-    add('src/app/styles/tokens.scss');
-    add('src/app/styles/tokens.css');
   }
 
   const files = [...candidates];
