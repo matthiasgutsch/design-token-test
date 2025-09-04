@@ -5,4 +5,8 @@
   height: calc(6 * var(--grid-unit));
   color: var(--color-background);
   border: 0px;
+
+  &:hover {
+    background-color: var(--color-secondary);
+  }
 }

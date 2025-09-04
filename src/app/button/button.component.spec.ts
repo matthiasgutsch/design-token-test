@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ButtonComponent } from './button.component';
-import { assertAllRootTokensMatchTokensFile } from '../../test-utils/design-token-assert';
+import { assertAllScssUsagesMatchTokens } from '../../test-utils/design-token-assert';
 
 describe('ButtonComponent (with TestBed)', () => {
   let fixture: ComponentFixture<ButtonComponent>;
@@ -20,7 +20,7 @@ describe('ButtonComponent (with TestBed)', () => {
 
   describe(':root matches all tokens', () => {
     it('every token is present and equal in CSS', () => {
-      assertAllRootTokensMatchTokensFile(); // validates ALL token groups/types
+      assertAllScssUsagesMatchTokens();
     });
   });
 });

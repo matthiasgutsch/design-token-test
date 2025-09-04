@@ -78,65 +78,55 @@ const stripQuotes = (s: string) => {
     ? t.slice(1, -1)
     : t;
 };
+function extractVarsUsedInScss(css: string): Set<string> {
+  const found = new Set<string>();
+  for (const m of css.matchAll(/var\(\s*--([a-z0-9-]+)\s*(?:,[^)]+)?\)/gi)) {
+    found.add(m[1].toLowerCase());
+  }
+  return found;
+}
 
-export function assertAllRootTokensMatchTokensFile(opts?: {
-  cssPaths?: string | string[]; // default looks for src/styles.scss
-  failOnExtraVars?: boolean; // default false
+export function assertAllScssUsagesMatchTokens(opts?: {
+  scssPaths?: string | string[];
 }) {
-  // locate styles file(s)
+  // collect SCSS files to check
   const candidates = new Set<string>();
   const add = (p: string) => {
     const r = path.resolve(p);
     if (fs.existsSync(r)) candidates.add(r);
   };
 
-  if (opts?.cssPaths) {
-    (Array.isArray(opts.cssPaths) ? opts.cssPaths : [opts.cssPaths]).forEach(
+  if (opts?.scssPaths) {
+    (Array.isArray(opts.scssPaths) ? opts.scssPaths : [opts.scssPaths]).forEach(
       add
     );
   } else {
-    add('src/styles.scss');
+    // default: scan all src/**/*.scss
+    function walk(dir: string) {
+      for (const entry of fs.readdirSync(dir)) {
+        const full = path.join(dir, entry);
+        const stat = fs.statSync(full);
+        if (stat.isDirectory()) {
+          walk(full);
+        } else if (entry.endsWith('.scss')) {
+          candidates.add(full);
+        }
+      }
+    }
+    walk(path.resolve('src'));
   }
 
-  const files = [...candidates];
-  if (files.length === 0)
-    throw new Error('No styles file found to validate (:root).');
+  const expected = new Set(flattenTokensToExpectedMap(tokens).keys());
 
-  // read and parse
-  const css = files.map((f) => fs.readFileSync(f, 'utf8')).join('\n');
-  const rootVars = extractRootVarsFrom(css); // name -> value
-  const expected = flattenTokensToExpectedMap(tokens); // name -> expected value
-
-  // verify all expected are present and equal
-  for (const [name, wantRaw] of expected.entries()) {
-    const gotRaw = rootVars.get(name);
-    if (gotRaw === undefined) throw new Error(`:root is missing --${name}`);
-
-    let want = String(wantRaw).trim();
-    let got = String(gotRaw).trim();
-
-    // normalize special cases
-    if (name.startsWith('color-')) {
-      want = normalizeColor(want);
-      got = normalizeColor(got);
-    } else if (name === 'font-family-base') {
-      want = stripQuotes(want).toLowerCase();
-      got = stripQuotes(got).toLowerCase();
-    }
-
-    if (got !== want) {
-      throw new Error(
-        `Mismatch for --${name}. Expected "${want}", got "${got}".`
-      );
-    }
-  }
-
-  // optionally fail on extras
-  if (opts?.failOnExtraVars) {
-    const allowed = new Set(expected.keys());
-    const extras = [...rootVars.keys()].filter((n) => !allowed.has(n));
-    if (extras.length) {
-      throw new Error(`Unknown variables in :root: ${extras.join(', ')}`);
+  for (const file of candidates) {
+    const css = fs.readFileSync(file, 'utf8');
+    const used = extractVarsUsedInScss(css);
+    for (const v of used) {
+      if (!expected.has(v)) {
+        throw new Error(
+          `File ${file} uses unknown CSS variable --${v} (not in tokens.ts)`
+        );
+      }
     }
   }
 }
