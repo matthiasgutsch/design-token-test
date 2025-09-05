@@ -1,10 +1,11 @@
 .app-button {
   background-color: var(--color-primary);
-  padding: var(--grid-unit);
+  padding: calc(0.5 * var(--grid-unit)) calc(2 * var(--grid-unit));
   font-family: var(--font-family-base);
   height: calc(6 * var(--grid-unit));
   color: var(--color-background);
   border: 0px;
+  border-radius: calc(0.5 * var(--grid-unit));
 
   &:hover {
     background-color: var(--color-secondary);
