@@ -1,8 +1,8 @@
 export const tokens = {
   gridUnit: '8px',
   colors: {
-    primary: '#1a43e8',
-    secondary: '#e91e63',
+    primary: '#d7172f',
+    secondary: '#a61121',
     background: '#ffffff',
   },
   typography: {
