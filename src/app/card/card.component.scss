@@ -1,0 +1,16 @@
+.card {
+  color: var(--color-primary);
+  font-family: var(--font-family-base);
+  padding: calc(2 * var(--grid-unit)) calc(2 * var(--grid-unit));
+  border-radius: var(--grid-unit);
+  &.border {
+  }
+
+  &.filled {
+    background-color: var(--color-white);
+  }
+
+  &.dcui-shadows-low-neutral {
+    box-shadow: 0 3px 7px rgba(83, 86, 90, 0.2);
+  }
+}
