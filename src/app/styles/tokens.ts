@@ -4,6 +4,8 @@ export const tokens = {
     primary: '#d7172f',
     secondary: '#a61121',
     background: '#ffffff',
+    dark: '#333333',
+    white: '#ffffff',
   },
   typography: {
     fontFamily: '"Roboto", sans-serif',

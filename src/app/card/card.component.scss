@@ -1,7 +1,7 @@
 .card {
   color: var(--color-dark);
   font-family: var(--font-family-base);
-  padding: calc(2 * var(--grid-unit)) calc(4 * var(--grid-unit));
+  padding: calc(4 * var(--grid-unit)) calc(4 * var(--grid-unit));
   border-radius: var(--grid-unit);
   border: 1px solid var(--color-dark);
   margin-top: calc(2 * var(--grid-unit));
