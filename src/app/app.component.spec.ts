@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { assertAllScssUsagesMatchTokens } from '../test-utils/design-token-assert';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
@@ -24,6 +25,14 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, token-test');
+    expect(compiled.querySelector('h1')?.textContent).toContain(
+      'Hello, token-test'
+    );
+  });
+
+  describe(':root matches all tokens', () => {
+    it('every token is present and equal in CSS', () => {
+      assertAllScssUsagesMatchTokens();
+    });
   });
 });

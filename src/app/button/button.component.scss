@@ -4,7 +4,7 @@
   font-family: var(--font-family-base);
   height: calc(6 * var(--grid-unit));
   color: var(--color-background);
-  border: 0px;
+  border: none;
   border-radius: calc(0.5 * var(--grid-unit));
 
   &:hover {

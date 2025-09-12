@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { tokens } from '../app/styles/tokens';
 
+const SAFE_LITERALS = new Set(['0', 'none', '1px', 'solid', 'transparent']);
+
 type AnyObj = Record<string, unknown>;
 const kebab = (s: string) =>
   s
@@ -48,16 +50,6 @@ function flattenTokensToExpectedMap(
   return out;
 }
 
-function extractRootVarsFrom(css: string) {
-  const map = new Map<string, string>();
-  for (const block of css.matchAll(/:root\s*\{([\s\S]*?)\}/g)) {
-    for (const decl of block[1].matchAll(/--([a-z0-9-]+)\s*:\s*([^;]+);/gi)) {
-      map.set(decl[1].toLowerCase(), decl[2].trim());
-    }
-  }
-  return map;
-}
-
 function normalizeColor(x: string) {
   let v = x.trim().toLowerCase();
   if (!v.startsWith('#')) return v;
@@ -71,6 +63,7 @@ function normalizeColor(x: string) {
         .join('');
   return v;
 }
+
 const stripQuotes = (s: string) => {
   const t = s.trim();
   return (t.startsWith('"') && t.endsWith('"')) ||
@@ -86,11 +79,54 @@ function extractVarsUsedInScss(css: string): Set<string> {
   return found;
 }
 
+function extractCssDeclarations(css: string): Map<string, Set<string>> {
+  const decls = new Map<string, Set<string>>();
+  for (const block of css.matchAll(/\{([\s\S]*?)\}/g)) {
+    for (const decl of block[1].matchAll(/([a-z-]+)\s*:\s*([^;]+);/gi)) {
+      const prop = decl[1].toLowerCase();
+      const val = decl[2].trim();
+      if (!decls.has(prop)) decls.set(prop, new Set());
+      decls.get(prop)!.add(val);
+    }
+  }
+  return decls;
+}
+
+function assertCssValuesFromTokens(
+  css: string,
+  tokenMap: Map<string, string>,
+  file: string
+) {
+  const decls = extractCssDeclarations(css);
+  const tokenValues = new Set(
+    [...tokenMap.values()].map((v) => normalizeColor(stripQuotes(v)))
+  );
+
+  for (const [prop, values] of decls.entries()) {
+    for (const val of values) {
+      const normalized = normalizeColor(stripQuotes(val));
+      const isTokenRef = /var\(--[a-z0-9-]+\)/i.test(val);
+      const isCalcToken = /calc\([^)]*var\(--[a-z0-9-]+\)[^)]*\)/i.test(val);
+
+      if (
+        !isTokenRef &&
+        !isCalcToken &&
+        !tokenValues.has(normalized) &&
+        !SAFE_LITERALS.has(normalized)
+      ) {
+        throw new Error(
+          `File ${file} uses hardcoded value "${val}" for "${prop}" not found in tokens.ts`
+        );
+      }
+    }
+  }
+}
+
 export function assertAllScssUsagesMatchTokens(opts?: {
   scssPaths?: string | string[];
 }) {
-  // collect SCSS files to check
-  const candidates = new Set<string>();
+  const candidates = new Set<string>(); // ✅ Declare here at the top
+
   const add = (p: string) => {
     const r = path.resolve(p);
     if (fs.existsSync(r)) candidates.add(r);
@@ -101,7 +137,6 @@ export function assertAllScssUsagesMatchTokens(opts?: {
       add
     );
   } else {
-    // default: scan all src/**/*.scss
     function walk(dir: string) {
       for (const entry of fs.readdirSync(dir)) {
         const full = path.join(dir, entry);
@@ -116,11 +151,13 @@ export function assertAllScssUsagesMatchTokens(opts?: {
     walk(path.resolve('src'));
   }
 
-  const expected = new Set(flattenTokensToExpectedMap(tokens).keys());
+  const tokenMap = flattenTokensToExpectedMap(tokens);
+  const expected = new Set(tokenMap.keys());
 
   for (const file of candidates) {
     const css = fs.readFileSync(file, 'utf8');
     const used = extractVarsUsedInScss(css);
+
     for (const v of used) {
       if (!expected.has(v)) {
         throw new Error(
@@ -128,5 +165,31 @@ export function assertAllScssUsagesMatchTokens(opts?: {
         );
       }
     }
+
+    assertCssValuesFromTokens(css, tokenMap, file);
   }
+}
+
+/* for single component */
+
+export function assertScssComponentMatchesTokens(filePath: string) {
+  const resolvedPath = path.resolve(filePath);
+  if (!fs.existsSync(resolvedPath)) {
+    throw new Error(`SCSS file not found: ${resolvedPath}`);
+  }
+
+  const css = fs.readFileSync(resolvedPath, 'utf8');
+  const tokenMap = flattenTokensToExpectedMap(tokens);
+  const expectedVars = new Set(tokenMap.keys());
+
+  const usedVars = extractVarsUsedInScss(css);
+  for (const v of usedVars) {
+    if (!expectedVars.has(v)) {
+      throw new Error(
+        `File ${filePath} uses unknown CSS variable --${v} (not in tokens.ts)`
+      );
+    }
+  }
+
+  assertCssValuesFromTokens(css, tokenMap, filePath);
 }
