@@ -2,7 +2,16 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { tokens } from '../app/styles/tokens';
 
-const SAFE_LITERALS = new Set(['0', 'none', '1px', 'solid', 'transparent']);
+const SAFE_LITERALS = new Set([
+  '0',
+  'none',
+  '1px',
+  'solid',
+  'transparent',
+  'display: inline-flex',
+  'inline-flex',
+  'center',
+]);
 
 type AnyObj = Record<string, unknown>;
 const kebab = (s: string) =>

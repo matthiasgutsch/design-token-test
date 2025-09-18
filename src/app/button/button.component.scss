@@ -6,6 +6,9 @@
   color: var(--color-background);
   border: none;
   border-radius: calc(0.5 * var(--grid-unit));
+  display: inline-flex;
+  align-items: center;
+  gap: calc(0.5 * var(--grid-unit));
 
   &:hover {
     background-color: var(--color-secondary);
