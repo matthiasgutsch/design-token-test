@@ -3,7 +3,7 @@ import { IconComponent } from './icon.component';
 import {
   assertAllScssUsagesMatchTokens,
   assertScssComponentMatchesTokens,
-} from '../../test-utils/design-token-assert';
+} from '../../../test-utils/design-token-assert';
 import path from 'path';
 
 describe('ButtonComponent (with TestBed)', () => {

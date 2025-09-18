@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CardComponent } from './card.component';
-import { assertAllScssUsagesMatchTokens } from '../../test-utils/design-token-assert';
+import { assertAllScssUsagesMatchTokens } from '../../../test-utils/design-token-assert';
 
 describe('CardComponent', () => {
   let component: CardComponent;
