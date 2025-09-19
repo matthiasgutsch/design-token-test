@@ -17,6 +17,7 @@
 
   &:hover {
     background-color: var(--color-secondary);
+    border: calc(0.25 * var(--grid-unit)) solid var(--color-secondary);
   }
 
   &.secondary {
