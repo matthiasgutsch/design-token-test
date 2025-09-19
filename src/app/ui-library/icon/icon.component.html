@@ -1,4 +1,4 @@
-<ng-container *ngIf="name === 'info'">
+<ng-container *ngIf="name() === 'info'">
   <svg
     class="icon"
     width="24"
@@ -21,7 +21,7 @@
   </svg>
 </ng-container>
 
-<ng-container *ngIf="name === 'settings'">
+<ng-container *ngIf="name() === 'settings'">
   <svg
     class="icon"
     viewBox="0 0 30 30"

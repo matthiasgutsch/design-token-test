@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, input, Input } from '@angular/core';
 
 @Component({
   selector: 'app-icon',
@@ -8,7 +8,5 @@ import { Component, Input } from '@angular/core';
   imports: [CommonModule],
 })
 export class IconComponent {
-  @Input() name!: string;
-  @Input() size: number = 24;
-  @Input() alt: string = '';
+  name = input<string>('');
 }

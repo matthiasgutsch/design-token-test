@@ -3,13 +3,13 @@
   class="app-button {{ type }}"
   (click)="handleClick()"
 >
-  <ng-container *ngIf="iconPosition === 'left'">
-    <app-icon *ngIf="icon" [name]="icon"></app-icon>
+  <ng-container *ngIf="iconPosition() === 'left'">
+    <app-icon *ngIf="icon" [name]="icon()"></app-icon>
   </ng-container>
 
   <div>{{ title }}</div>
 
-  <ng-container *ngIf="iconPosition === 'right'">
-    <app-icon *ngIf="icon" [name]="icon"></app-icon>
+  <ng-container *ngIf="iconPosition() === 'right'">
+    <app-icon *ngIf="icon" [name]="icon()"></app-icon>
   </ng-container>
 </button>
