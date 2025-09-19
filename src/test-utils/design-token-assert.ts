@@ -11,6 +11,8 @@ const SAFE_LITERALS = new Set([
   'display: inline-flex',
   'inline-flex',
   'center',
+  'display',
+  'flex',
 ]);
 
 type AnyObj = Record<string, unknown>;

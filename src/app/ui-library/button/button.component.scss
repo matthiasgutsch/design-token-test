@@ -8,7 +8,7 @@
   border-radius: calc(0.5 * var(--grid-unit));
   display: inline-flex;
   align-items: center;
-  gap: calc(0.5 * var(--grid-unit));
+  gap: calc(1 * var(--grid-unit));
 
   &:hover {
     background-color: var(--color-secondary);
