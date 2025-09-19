@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 export class ButtonComponent {
   @Input() title: string = '';
   @Input() icon: string = '';
+  @Input() type: 'primary' | 'secondary' = 'primary';
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() disabled: boolean = false;
   @Output() clicked = new EventEmitter<void>();

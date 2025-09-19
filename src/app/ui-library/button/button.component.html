@@ -1,4 +1,8 @@
-<button [disabled]="disabled" class="app-button" (click)="handleClick()">
+<button
+  [disabled]="disabled"
+  class="app-button {{ type }}"
+  (click)="handleClick()"
+>
   <ng-container *ngIf="iconPosition === 'left'">
     <app-icon *ngIf="icon" [name]="icon"></app-icon>
   </ng-container>
